@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdf version='1.7'>
+
+<model name="drone_utn"> <!-- Nota: el dron esta mirando en sentido de las X+. Hacia "adelante" es X+. -->
+    <pose>0 0 30.3e-3 0 0 0</pose>
+    <frame name="drone_utn_frame"/>
+    <self_collide>false</self_collide>
+    <static>false</static>
+    <link name='base_link'>		
+        <gravity>true</gravity>
+        <velocity_decay/>
+        <inertial>
+            <pose>9.593e-3 -9.593e-3 30.381e-3 0 0 0</pose>			<!-- Esta es la posición del centro de masa respecto del sistema de referencia del model-->
+            <mass>1.82993</mass>			<!-- Masa total del cuerpo, sin las helices ni imus -->
+            <inertia>			<!-- Esto incluye los momentos de inercia de los motores, sin las helices. -->
+                <!--Medidas por el onshape desplazado-->
+                <ixx> 31221.531e-6 </ixx>
+                <ixy> -4505.665e-6 </ixy>
+                <ixz> -132.935e-6 </ixz>
+                <iyy> 31224.965e-6 </iyy>
+                <iyz> 129.411e-6 </iyz>
+                <izz> 59796.016e-6 </izz>		<!-- no existen los tags iyx, izx , izy porque son redundantes por simetría -->
+            </inertia>
+        </inertial>
+        <!-- Esta sección determina la ubicación y geometría del dibujito que va a tener el link -->
+        <visual name='base_link_visual'>
+            <pose> 0 0 0 0 0 0</pose>
+            <cast_shadows>true</cast_shadows>
+            <geometry>
+                <mesh>
+                    <scale>1 1 1</scale>		<!-- Como usamos los modelos importados del onshape, ya vienen con la escala real -->
+                    <uri>model://drone_utn/meshes/base_link.obj</uri>		<!-- Esto es la ubicación relativa del archivo .obj que determina la geometría. Exportado directamente desde onShape -->
+                </mesh>
+            </geometry>
+            <material>	<!-- Material solo determina como se renderiza la imagen del visual. Aca le pusimos color purple -->
+                <ambient>0.8 0.8 0.8 1</ambient>
+                <diffuse>0.8 0.8 0.8 1</diffuse>
+                <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <!-- Esta sección determina la geometría que se va a usar para las colisiones del link -->
+        <collision name='base_link_inertia_collision'>
+            <pose> 0 0 0 0 0 0</pose>
+            <!-- La geometría de las collision box hay que modificarlas porque no se ajustan -->
+            <geometry>
+                <box>
+                    <size>0.47 0.47 0.11</size>
+                </box>
+            </geometry>
+            <!-- Hay que dejar el surface porque se modifican los valores por default de la simulación ODE -->
+            <surface>
+                <contact>
+                <ode>
+                    <min_depth>0.001</min_depth>
+                    <max_vel>0</max_vel>
+                </ode>
+                </contact>
+                <friction>
+                    <ode/>
+                </friction>
+            </surface>
+        </collision>
+        <sensor name="magnetometer_sensor" type="magnetometer">
+            <always_on>1</always_on>
+            <update_rate>100</update_rate>
+            <magnetometer>
+                <x>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0.0004</stddev>
+                        <dynamic_bias_correlation_time>600</dynamic_bias_correlation_time>
+                        <bias_mean>6.4e-6</bias_mean>
+                    </noise>
+                </x>
+                <y>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0.0004</stddev>
+                        <dynamic_bias_correlation_time>600</dynamic_bias_correlation_time>
+                        <bias_mean>6.4e-6</bias_mean>
+                    </noise>
+                </y>
+                <z>
+                    <noise type="gaussian">
+                        <mean>0</mean>
+                        <stddev>0.0004</stddev>
+                        <dynamic_bias_correlation_time>600</dynamic_bias_correlation_time>
+                        <bias_mean>6.4e-6</bias_mean>
+                    </noise>
+                </z>
+            </magnetometer>
+        </sensor>
+        <sensor name="air_pressure_sensor" type="air_pressure">
+            <always_on>1</always_on>
+            <update_rate>50</update_rate>
+            <air_pressure>
+                <pressure>
+                    <noise type="gaussian">
+                    <mean>0</mean>
+                    <stddev>0.01</stddev>
+                    </noise>
+                </pressure>
+            </air_pressure>
+        </sensor>
+        <sensor name="imu_sensor" type="imu">
+            <always_on>1</always_on>
+            <update_rate>250</update_rate>
+        </sensor>
+    </link>
+
+    <!-- Helice 0 ( CW )-->
+    <!-- Nota: Hay que modificar los parametros para las helices. Estamos probando con helices que no se corresponden con las que tenemos nosotros -->
+    <!-- Nota2: Las helices CW y CCW no comparten los momentos de inercia. -->
+    <link name='rotor_0'>
+        <gravity>true</gravity>
+        <self_collide>false</self_collide>
+        <velocity_decay/>
+        <pose relative_to='drone_utn_frame'> 119e-3 119e-3 0.062676 0 0 0</pose>
+        <inertial>
+            <mass>0.01</mass>
+            <inertia>
+                <ixx>8.4464e-07</ixx>
+                <ixy>-7.2191e-07</ixy>
+                <ixz>5.3515e-13</ixz>
+                <iyy>6.4014e-07</iyy>
+                <iyz>5.5137e-13</iyz>
+                <izz>1.4805e-06</izz>
+            </inertia>
+        </inertial>
+        <visual name='rotor_0_visual'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <cast_shadows>true</cast_shadows>
+            <geometry>
+                <mesh>
+                    <scale>1 1 1</scale>
+                    <uri>model://drone_utn/meshes/propeller_0.STL</uri>
+                </mesh>
+            </geometry>
+            <material>
+                <ambient>0 0 1 1</ambient>
+                <diffuse>0 0 1 1</diffuse>
+                <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <collision name='rotor_0_collision'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <geometry>
+                <cylinder>
+                    <length>0.005</length>
+                    <radius>0.128</radius>
+                </cylinder>
+            </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <min_depth>0.001</min_depth>
+                        <max_vel>0</max_vel>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode/>
+                </friction>
+            </surface>
+        </collision> 
+    </link>
+    <joint name='rotor_0_joint' type='revolute'>
+        <parent>base_link</parent>
+        <child>rotor_0</child>
+        <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+                <lower>-1e+16</lower>
+                <upper>1e+16</upper>
+            </limit>
+            <dynamics>
+                <spring_reference>0</spring_reference>
+                <spring_stiffness>0</spring_stiffness>
+            </dynamics>
+        </axis>
+    </joint>
+
+    <!-- Helice 1 (CCW) -->
+    <link name='rotor_1'>
+        <gravity>true</gravity>
+        <self_collide>false</self_collide>
+        <velocity_decay/>
+        <pose relative_to='drone_utn_frame'>119e-3 -119e-3 0.062676 0 0 0</pose>
+        <inertial>
+            <mass>0.01</mass>
+            <inertia>
+                <ixx>8.5496e-07</ixx>
+                <ixy>7.1953e-07</ixy>
+                <ixz>-4.1012e-13</ixz>
+                <iyy>6.2836e-07</iyy>
+                <iyz>5.491e-13</iyz>
+                <izz>1.479e-06</izz>
+            </inertia>
+        </inertial>
+        <visual name='rotor_1_visual'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <cast_shadows>true</cast_shadows>
+            <geometry>
+                <mesh>
+                    <scale>1 1 1</scale>
+                    <uri>model://drone_utn/meshes/propeller_0.STL</uri>
+                </mesh>
+            </geometry>
+            <material>
+                <ambient>1 0 0 1</ambient>
+                <diffuse>1 0 0 1</diffuse>
+                <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <collision name='rotor_1_collision'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <geometry>
+                <cylinder>
+                    <length>0.005</length>
+                    <radius>0.064</radius>
+                </cylinder>
+            </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <min_depth>0.001</min_depth>
+                        <max_vel>0</max_vel>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode/>
+                </friction>
+            </surface>
+        </collision>
+    </link>
+    <joint name='rotor_1_joint' type='revolute'>
+        <parent>base_link</parent>
+        <child>rotor_1</child>
+        <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+            </limit>
+            <dynamics>
+                <spring_reference>0</spring_reference>
+                <spring_stiffness>0</spring_stiffness>
+            </dynamics>
+        </axis>
+    </joint>
+
+    <!-- Helice 2 (CW) -->
+    <link name='rotor_2'>
+        <gravity>true</gravity>
+        <self_collide>false</self_collide>
+        <velocity_decay/>
+        <pose relative_to='drone_utn_frame'> -119e-3 -119e-3 0.062676 0 0 0</pose>
+        <inertial>
+            <mass>0.01</mass>
+            <inertia>
+                <ixx>8.4464e-07</ixx>
+                <ixy>-7.2191e-07</ixy>
+                <ixz>4.5077e-13</ixz>
+                <iyy>6.4014e-07</iyy>
+                <iyz>4.5674e-13</iyz>
+                <izz>1.4805e-06</izz>
+            </inertia>
+        </inertial>
+        <visual name='rotor_2_visual'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <cast_shadows>true</cast_shadows>
+            <geometry>
+                <mesh>
+                    <scale>1 1 1</scale>
+                    <uri>model://drone_utn/meshes/propeller_1.STL</uri>
+                </mesh>
+            </geometry>
+            <material>
+                <ambient>0 0 1 1</ambient>
+                <diffuse>0 0 1 1</diffuse>
+                <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <collision name='rotor_2_collision'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <geometry>
+                <cylinder>
+                    <length>0.005</length>
+                    <radius>0.064</radius>
+                </cylinder>
+            </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <min_depth>0.001</min_depth>
+                        <max_vel>0</max_vel>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode/>
+                </friction>
+            </surface>
+        </collision>
+    </link>
+    <joint name='rotor_2_joint' type='revolute'>
+        <parent>base_link</parent>
+        <child>rotor_2</child>
+        <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+                <lower>-1e+16</lower>
+                <upper>1e+16</upper>
+            </limit>
+            <dynamics>
+                <spring_reference>0</spring_reference>
+                <spring_stiffness>0</spring_stiffness>
+            </dynamics>
+        </axis>
+    </joint>
+
+    <!-- Helice 3 (CCW) -->
+    <link name='rotor_3'>
+        <gravity>true</gravity>
+        <self_collide>false</self_collide>
+        <velocity_decay/>
+        <pose relative_to='drone_utn_frame'> -119e-3 119e-3 0.062676 0 0 0</pose>
+        <inertial>
+            <mass>0.01</mass>
+            <inertia>
+                <ixx>8.5496e-07</ixx>
+                <ixy>7.1953e-07</ixy>
+                <ixz>-4.184e-13</ixz>
+                <iyy>6.2836e-07</iyy>
+                <iyz>5.3609e-13</iyz>
+                <izz>1.479e-06</izz>
+            </inertia>
+        </inertial>
+        <visual name='rotor_3_visual'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <cast_shadows>true</cast_shadows>
+            <geometry>
+                <mesh>
+                    <scale>1 1 1</scale>
+                    <uri>model://drone_utn/meshes/propeller_1.STL</uri>
+                </mesh>
+            </geometry>
+            <material>
+                <ambient>1 0 0 1</ambient>
+                <diffuse>1 0 0 1</diffuse>
+                <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+        <collision name='rotor_3_collision'>
+            <pose> 0 0 0 0 0 0 </pose>
+            <geometry>
+                <cylinder>
+                    <length>0.005</length>
+                    <radius>0.064</radius>
+                </cylinder>
+            </geometry>
+            <surface>
+                <contact>
+                    <ode>
+                        <min_depth>0.001</min_depth>
+                        <max_vel>0</max_vel>
+                    </ode>
+                </contact>
+                <friction>
+                    <ode/>
+                </friction>
+            </surface>
+        </collision>
+    </link>
+    <joint name='rotor_3_joint' type='revolute'>
+        <parent>base_link</parent>
+        <child>rotor_3</child>
+        <axis>
+            <xyz>0 0 1</xyz>
+            <limit>
+            <lower>-1e+16</lower>
+            <upper>1e+16</upper>
+            </limit>
+            <dynamics>
+                <spring_reference>0</spring_reference>
+                <spring_stiffness>0</spring_stiffness>
+            </dynamics>
+        </axis>
+    </joint>
+
+    <model name='gps0'>		<!-- Estamos haciendo composición de objetos -->
+        <pose relative_to="drone_utn_frame">0 0 0 0 0 0</pose>
+        <link name='gps0_link'>
+            <pose>0 0 0 0 0 0</pose>
+            <inertial>
+            <mass>0.01</mass>
+                <inertia>
+                    <ixx>2.1733e-06</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>2.1733e-06</iyy>
+                    <iyz>0</iyz>
+                    <izz>1.8e-07</izz>
+                </inertia>
+            </inertial>
+            <visual name='visual'>
+                <cast_shadows>true</cast_shadows>
+                <geometry>
+                    <cylinder>
+                        <radius>0.01</radius>
+                        <length>0.002</length>
+                    </cylinder>
+                </geometry>
+                <material>
+                    <ambient>0 0 0 1</ambient>
+                    <diffuse>0 0 0 1</diffuse>
+                    <specular>1 1 1 1</specular>
+                </material>
+            </visual>
+            <sensor name='gps' type='gps'> <!-- Queda pendiente por analizar -->
+                <always_on>1</always_on>
+                <update_rate>1</update_rate>
+                <gps>
+                    <position_sensing>
+                        <horizontal>
+                            <noise type="gaussian">
+                                <mean>1</mean>
+                                <stddev>0.0002</stddev>
+                                <bias_mean>2.0</bias_mean>
+                            </noise>
+                        </horizontal>
+                        <vertical>
+                            <noise type="gaussian">
+                                <mean>1</mean>
+                                <stddev>0.4</stddev>
+                                <bias_mean>4.0</bias_mean>
+                            </noise>
+                        </vertical>
+                    </position_sensing>
+                </gps>
+            </sensor>
+        </link>
+    </model>
+    <joint name='gps0_joint' type='fixed'>
+        <parent>base_link</parent>
+        <child>gps0::gps0_link</child>
+    </joint>
+
+    <!-- Bateria (carga) -->
+    <link name='battery_link'>
+        <pose relative_to='drone_utn_frame'> 0 0 -13.1e-3 0 0 0</pose>
+        <inertial>
+            <pose>0 0 0 0 0 0</pose>
+            <mass>250e-3</mass>
+            <inertia>
+                <ixx> 133.987e-6 </ixx>
+                <ixy> 98.351e-6 </ixy>
+                <ixz> 0 </ixz>
+                <iyy> 133.987e-6 </iyy>
+                <iyz> 0 </iyz>
+                <izz> 241.8e-6 </izz>
+            </inertia>
+        </inertial>
+        <visual name='battery_link_visual'>
+            <cast_shadows>true</cast_shadows>
+            <pose> 0 0 0 0 0 0</pose>
+            <geometry>
+                <mesh>
+                    <scale>1 1 1</scale>
+                    <uri>model://drone_utn/meshes/battery_link.obj</uri>
+                </mesh>
+            </geometry>
+            <material>
+                <ambient>0 0 0 1</ambient>
+                <diffuse>0 0 0 1</diffuse>
+                <specular>1 1 1 1</specular>
+            </material>
+        </visual>
+    </link>
+    <joint name='battery_joint' type='fixed'>
+        <child>battery_link</child>
+        <parent>base_link</parent>
+    </joint>
+
+    <!-- Kinect -->     
+    <model name="kinect">
+        <pose relative_to="drone_utn_frame">0 0 80e-3 0 0 0</pose>
+        <link name="kinect_link">
+            <inertial>
+                <mass>0.1</mass>
+                <inertia>
+                    <ixx> 522.20912e-6 </ixx>
+                    <ixy> 1.14565e-6 </ixy>
+                    <ixz> -0.43509e-6 </ixz>
+
+                    <iyy> 3917.35486e-6 </iyy>
+                    <iyz> -4.51692e-6 </iyz>
+
+                    <izz> 3889.88227e-6 </izz>
+                </inertia>
+            </inertial>
+            <visual name="visual">
+                <cast_shadows>true</cast_shadows>
+                <pose>25e-3 0 0 0 0 0</pose> <!-- Esto es porque el modelo 3D esta centrado en una esquina -->
+                <geometry>
+                    <mesh>
+                        <uri>model://drone_utn/meshes/kinect.dae</uri>
+                    </mesh>
+                </geometry>
+                <material>	<!-- Material solo determina como se renderiza la imagen del visual.-->
+                    <ambient>0.05 0.05 0.05 1</ambient>
+                    <diffuse>0.05 0.05 0.05 1</diffuse>
+                    <specular>1 1 1 1</specular>
+                </material>
+            </visual>
+            <!-- Sacamos las colisiones para simular unicamente el efecto de la camara -->
+            <collision name="collision">
+                <geometry>
+                    <box>
+                        <size>1e-3 1e-3 1e-3</size>
+                    </box>
+                </geometry>
+            </collision>
+            <sensor name="camera" type="rgbd_camera">
+                <topic>/camera</topic>
+                <always_on>1</always_on>
+                <update_rate>10</update_rate>
+                <visualize>true</visualize>
+                <camera>
+                    <horizontal_fov>1.047198</horizontal_fov>
+                    <image>
+                        <width>320</width>
+                        <height>240</height>
+                        <format>R8G8B8</format>
+                    </image>
+                    <clip>
+                        <near>0.05</near>
+                        <far>3</far>
+                    </clip>
+                    <depth_camera>
+                        <output>depths</output>
+                        <clip>
+                            <near>0.05</near>
+                            <far>3</far>
+                        </clip>
+                    </depth_camera>
+                </camera>
+                
+            </sensor>
+        </link>
+    </model>
+    <joint name='kinect_joint' type='fixed'>
+        <parent>base_link</parent>
+        <child>kinect::kinect_link</child>
+    </joint>
+
+    <link name='imu_link'>
+      <pose relative_to='drone_utn_frame'> 0 0 0 0 0 0 </pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass> 0.015 </mass>
+        <inertia>
+          <ixx>1e-05</ixx>
+          <iyy>1e-05</iyy>
+          <izz>1e-05</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='imu_joint' type='fixed'>
+      <child>imu_link</child>
+      <parent>base_link</parent>
+    </joint>
+
+    <!-- Motor 1 Plugin (Front Left)- Rotor 0 (CW)-->
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+        <jointName>rotor_0_joint</jointName>
+        <linkName>rotor_0</linkName>
+        <turningDirection>cw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>1000</maxRotVelocity>
+        <motorConstant>12.8627e-06</motorConstant>
+        <momentConstant>0.017</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorNumber>2</motorNumber>
+        <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        <motorType>velocity</motorType>
+    </plugin>
+
+    <!-- Motor 2 Plugin (Front Right) - Rotor 1 (CW)-->
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+        <jointName>rotor_1_joint</jointName>
+        <linkName>rotor_1</linkName>
+        <turningDirection>ccw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>1000</maxRotVelocity>
+        <motorConstant>12.8627e-06</motorConstant>
+        <momentConstant>0.017</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorNumber>0</motorNumber>
+        <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        <motorType>velocity</motorType>
+    </plugin>
+
+    <!-- Motor 3 Plugin (Back Right) - Rotor 2 (CW)-->
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+        <jointName>rotor_2_joint</jointName>
+        <linkName>rotor_2</linkName>
+        <turningDirection>cw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>1000</maxRotVelocity>
+        <motorConstant>12.8627e-06</motorConstant>
+        <momentConstant>0.017</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorNumber>3</motorNumber>
+        <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        <motorType>velocity</motorType>
+    </plugin>
+
+    <!-- Motor 4 Plugin (Back Left) - Rotor 3 (CW)-->
+    <plugin filename="gz-sim-multicopter-motor-model-system" name="gz::sim::systems::MulticopterMotorModel">
+        <jointName>rotor_3_joint</jointName>
+        <linkName>rotor_3</linkName>
+        <turningDirection>ccw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>1000</maxRotVelocity>
+        <motorConstant>12.8627e-06</motorConstant>
+        <momentConstant>0.017</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorNumber>1</motorNumber>
+        <rotorDragCoefficient>0.000806428</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <rotorVelocitySlowdownSim>10</rotorVelocitySlowdownSim>
+        <motorType>velocity</motorType>
+    </plugin>
+</model>
+</sdf>
